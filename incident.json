@@ -1,0 +1,6 @@
+{
+  "serviceId": "payments",
+  "title": "Gateway test incident",
+  "description": "This is a test incident created through the local gateway.",
+  "severity": "Minor"
+}

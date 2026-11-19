@@ -1,0 +1,944 @@
+{
+    "openapi":  "3.0.4",
+    "info":  {
+                 "title":  "OpsPulse API",
+                 "description":  "Public service health and incident history. Incident mutations require a server-managed X-OpsPulse-Key. Probe configuration is private.",
+                 "version":  "v1"
+             },
+    "servers":  [
+                    {
+                        "url":  "http://localhost:5080/"
+                    }
+                ],
+    "paths":  {
+                  "/api/incidents":  {
+                                         "get":  {
+                                                     "tags":  [
+                                                                  "Incidents"
+                                                              ],
+                                                     "parameters":  [
+                                                                        {
+                                                                            "name":  "limit",
+                                                                            "in":  "query",
+                                                                            "schema":  {
+                                                                                           "maximum":  100,
+                                                                                           "minimum":  1,
+                                                                                           "pattern":  "^-?(?:0|[1-9]\\d*)$",
+                                                                                           "anyOf":  [
+                                                                                                         {
+                                                                                                             "type":  "integer"
+                                                                                                         },
+                                                                                                         {
+                                                                                                             "type":  "string"
+                                                                                                         }
+                                                                                                     ],
+                                                                                           "format":  "int32",
+                                                                                           "default":  50
+                                                                                       }
+                                                                        }
+                                                                    ],
+                                                     "responses":  {
+                                                                       "200":  {
+                                                                                   "description":  "OK",
+                                                                                   "content":  {
+                                                                                                   "text/plain":  {
+                                                                                                                      "schema":  {
+                                                                                                                                     "type":  "array",
+                                                                                                                                     "items":  {
+                                                                                                                                                   "$ref":  "#/components/schemas/IncidentDto"
+                                                                                                                                               }
+                                                                                                                                 }
+                                                                                                                  },
+                                                                                                   "application/json":  {
+                                                                                                                            "schema":  {
+                                                                                                                                           "type":  "array",
+                                                                                                                                           "items":  {
+                                                                                                                                                         "$ref":  "#/components/schemas/IncidentDto"
+                                                                                                                                                     }
+                                                                                                                                       }
+                                                                                                                        },
+                                                                                                   "text/json":  {
+                                                                                                                     "schema":  {
+                                                                                                                                    "type":  "array",
+                                                                                                                                    "items":  {
+                                                                                                                                                  "$ref":  "#/components/schemas/IncidentDto"
+                                                                                                                                              }
+                                                                                                                                }
+                                                                                                                 }
+                                                                                               }
+                                                                               }
+                                                                   }
+                                                 },
+                                         "post":  {
+                                                      "tags":  [
+                                                                   "Incidents"
+                                                               ],
+                                                      "requestBody":  {
+                                                                          "content":  {
+                                                                                          "application/json":  {
+                                                                                                                   "schema":  {
+                                                                                                                                  "$ref":  "#/components/schemas/CreateIncidentRequest"
+                                                                                                                              }
+                                                                                                               },
+                                                                                          "text/json":  {
+                                                                                                            "schema":  {
+                                                                                                                           "$ref":  "#/components/schemas/CreateIncidentRequest"
+                                                                                                                       }
+                                                                                                        },
+                                                                                          "application/*+json":  {
+                                                                                                                     "schema":  {
+                                                                                                                                    "$ref":  "#/components/schemas/CreateIncidentRequest"
+                                                                                                                                }
+                                                                                                                 }
+                                                                                      },
+                                                                          "required":  true
+                                                                      },
+                                                      "responses":  {
+                                                                        "201":  {
+                                                                                    "description":  "Created",
+                                                                                    "content":  {
+                                                                                                    "text/plain":  {
+                                                                                                                       "schema":  {
+                                                                                                                                      "$ref":  "#/components/schemas/IncidentDto"
+                                                                                                                                  }
+                                                                                                                   },
+                                                                                                    "application/json":  {
+                                                                                                                             "schema":  {
+                                                                                                                                            "$ref":  "#/components/schemas/IncidentDto"
+                                                                                                                                        }
+                                                                                                                         },
+                                                                                                    "text/json":  {
+                                                                                                                      "schema":  {
+                                                                                                                                     "$ref":  "#/components/schemas/IncidentDto"
+                                                                                                                                 }
+                                                                                                                  }
+                                                                                                }
+                                                                                },
+                                                                        "400":  {
+                                                                                    "description":  "Bad Request",
+                                                                                    "content":  {
+                                                                                                    "text/plain":  {
+                                                                                                                       "schema":  {
+                                                                                                                                      "$ref":  "#/components/schemas/ValidationProblemDetails"
+                                                                                                                                  }
+                                                                                                                   },
+                                                                                                    "application/json":  {
+                                                                                                                             "schema":  {
+                                                                                                                                            "$ref":  "#/components/schemas/ValidationProblemDetails"
+                                                                                                                                        }
+                                                                                                                         },
+                                                                                                    "text/json":  {
+                                                                                                                      "schema":  {
+                                                                                                                                     "$ref":  "#/components/schemas/ValidationProblemDetails"
+                                                                                                                                 }
+                                                                                                                  }
+                                                                                                }
+                                                                                },
+                                                                        "401":  {
+                                                                                    "description":  "Unauthorized",
+                                                                                    "content":  {
+                                                                                                    "text/plain":  {
+                                                                                                                       "schema":  {
+                                                                                                                                      "$ref":  "#/components/schemas/ProblemDetails"
+                                                                                                                                  }
+                                                                                                                   },
+                                                                                                    "application/json":  {
+                                                                                                                             "schema":  {
+                                                                                                                                            "$ref":  "#/components/schemas/ProblemDetails"
+                                                                                                                                        }
+                                                                                                                         },
+                                                                                                    "text/json":  {
+                                                                                                                      "schema":  {
+                                                                                                                                     "$ref":  "#/components/schemas/ProblemDetails"
+                                                                                                                                 }
+                                                                                                                  }
+                                                                                                }
+                                                                                },
+                                                                        "503":  {
+                                                                                    "description":  "Service Unavailable",
+                                                                                    "content":  {
+                                                                                                    "text/plain":  {
+                                                                                                                       "schema":  {
+                                                                                                                                      "$ref":  "#/components/schemas/ProblemDetails"
+                                                                                                                                  }
+                                                                                                                   },
+                                                                                                    "application/json":  {
+                                                                                                                             "schema":  {
+                                                                                                                                            "$ref":  "#/components/schemas/ProblemDetails"
+                                                                                                                                        }
+                                                                                                                         },
+                                                                                                    "text/json":  {
+                                                                                                                      "schema":  {
+                                                                                                                                     "$ref":  "#/components/schemas/ProblemDetails"
+                                                                                                                                 }
+                                                                                                                  }
+                                                                                                }
+                                                                                }
+                                                                    },
+                                                      "security":  [
+                                                                       {
+                                                                           "IncidentKey":  [
+
+                                                                                           ]
+                                                                       }
+                                                                   ]
+                                                  }
+                                     },
+                  "/api/incidents/{id}":  {
+                                              "get":  {
+                                                          "tags":  [
+                                                                       "Incidents"
+                                                                   ],
+                                                          "parameters":  [
+                                                                             {
+                                                                                 "name":  "id",
+                                                                                 "in":  "path",
+                                                                                 "required":  true,
+                                                                                 "schema":  {
+                                                                                                "type":  "string",
+                                                                                                "format":  "uuid"
+                                                                                            }
+                                                                             }
+                                                                         ],
+                                                          "responses":  {
+                                                                            "200":  {
+                                                                                        "description":  "OK",
+                                                                                        "content":  {
+                                                                                                        "text/plain":  {
+                                                                                                                           "schema":  {
+                                                                                                                                          "$ref":  "#/components/schemas/IncidentDto"
+                                                                                                                                      }
+                                                                                                                       },
+                                                                                                        "application/json":  {
+                                                                                                                                 "schema":  {
+                                                                                                                                                "$ref":  "#/components/schemas/IncidentDto"
+                                                                                                                                            }
+                                                                                                                             },
+                                                                                                        "text/json":  {
+                                                                                                                          "schema":  {
+                                                                                                                                         "$ref":  "#/components/schemas/IncidentDto"
+                                                                                                                                     }
+                                                                                                                      }
+                                                                                                    }
+                                                                                    },
+                                                                            "404":  {
+                                                                                        "description":  "Not Found",
+                                                                                        "content":  {
+                                                                                                        "text/plain":  {
+                                                                                                                           "schema":  {
+                                                                                                                                          "$ref":  "#/components/schemas/ProblemDetails"
+                                                                                                                                      }
+                                                                                                                       },
+                                                                                                        "application/json":  {
+                                                                                                                                 "schema":  {
+                                                                                                                                                "$ref":  "#/components/schemas/ProblemDetails"
+                                                                                                                                            }
+                                                                                                                             },
+                                                                                                        "text/json":  {
+                                                                                                                          "schema":  {
+                                                                                                                                         "$ref":  "#/components/schemas/ProblemDetails"
+                                                                                                                                     }
+                                                                                                                      }
+                                                                                                    }
+                                                                                    }
+                                                                        }
+                                                      }
+                                          },
+                  "/api/incidents/{id}/resolve":  {
+                                                      "patch":  {
+                                                                    "tags":  [
+                                                                                 "Incidents"
+                                                                             ],
+                                                                    "parameters":  [
+                                                                                       {
+                                                                                           "name":  "id",
+                                                                                           "in":  "path",
+                                                                                           "required":  true,
+                                                                                           "schema":  {
+                                                                                                          "type":  "string",
+                                                                                                          "format":  "uuid"
+                                                                                                      }
+                                                                                       }
+                                                                                   ],
+                                                                    "requestBody":  {
+                                                                                        "content":  {
+                                                                                                        "application/json":  {
+                                                                                                                                 "schema":  {
+                                                                                                                                                "$ref":  "#/components/schemas/ResolveIncidentRequest"
+                                                                                                                                            }
+                                                                                                                             },
+                                                                                                        "text/json":  {
+                                                                                                                          "schema":  {
+                                                                                                                                         "$ref":  "#/components/schemas/ResolveIncidentRequest"
+                                                                                                                                     }
+                                                                                                                      },
+                                                                                                        "application/*+json":  {
+                                                                                                                                   "schema":  {
+                                                                                                                                                  "$ref":  "#/components/schemas/ResolveIncidentRequest"
+                                                                                                                                              }
+                                                                                                                               }
+                                                                                                    },
+                                                                                        "required":  true
+                                                                                    },
+                                                                    "responses":  {
+                                                                                      "200":  {
+                                                                                                  "description":  "OK",
+                                                                                                  "content":  {
+                                                                                                                  "text/plain":  {
+                                                                                                                                     "schema":  {
+                                                                                                                                                    "$ref":  "#/components/schemas/IncidentDto"
+                                                                                                                                                }
+                                                                                                                                 },
+                                                                                                                  "application/json":  {
+                                                                                                                                           "schema":  {
+                                                                                                                                                          "$ref":  "#/components/schemas/IncidentDto"
+                                                                                                                                                      }
+                                                                                                                                       },
+                                                                                                                  "text/json":  {
+                                                                                                                                    "schema":  {
+                                                                                                                                                   "$ref":  "#/components/schemas/IncidentDto"
+                                                                                                                                               }
+                                                                                                                                }
+                                                                                                              }
+                                                                                              },
+                                                                                      "400":  {
+                                                                                                  "description":  "Bad Request",
+                                                                                                  "content":  {
+                                                                                                                  "text/plain":  {
+                                                                                                                                     "schema":  {
+                                                                                                                                                    "$ref":  "#/components/schemas/ValidationProblemDetails"
+                                                                                                                                                }
+                                                                                                                                 },
+                                                                                                                  "application/json":  {
+                                                                                                                                           "schema":  {
+                                                                                                                                                          "$ref":  "#/components/schemas/ValidationProblemDetails"
+                                                                                                                                                      }
+                                                                                                                                       },
+                                                                                                                  "text/json":  {
+                                                                                                                                    "schema":  {
+                                                                                                                                                   "$ref":  "#/components/schemas/ValidationProblemDetails"
+                                                                                                                                               }
+                                                                                                                                }
+                                                                                                              }
+                                                                                              },
+                                                                                      "401":  {
+                                                                                                  "description":  "Unauthorized",
+                                                                                                  "content":  {
+                                                                                                                  "text/plain":  {
+                                                                                                                                     "schema":  {
+                                                                                                                                                    "$ref":  "#/components/schemas/ProblemDetails"
+                                                                                                                                                }
+                                                                                                                                 },
+                                                                                                                  "application/json":  {
+                                                                                                                                           "schema":  {
+                                                                                                                                                          "$ref":  "#/components/schemas/ProblemDetails"
+                                                                                                                                                      }
+                                                                                                                                       },
+                                                                                                                  "text/json":  {
+                                                                                                                                    "schema":  {
+                                                                                                                                                   "$ref":  "#/components/schemas/ProblemDetails"
+                                                                                                                                               }
+                                                                                                                                }
+                                                                                                              }
+                                                                                              },
+                                                                                      "404":  {
+                                                                                                  "description":  "Not Found",
+                                                                                                  "content":  {
+                                                                                                                  "text/plain":  {
+                                                                                                                                     "schema":  {
+                                                                                                                                                    "$ref":  "#/components/schemas/ProblemDetails"
+                                                                                                                                                }
+                                                                                                                                 },
+                                                                                                                  "application/json":  {
+                                                                                                                                           "schema":  {
+                                                                                                                                                          "$ref":  "#/components/schemas/ProblemDetails"
+                                                                                                                                                      }
+                                                                                                                                       },
+                                                                                                                  "text/json":  {
+                                                                                                                                    "schema":  {
+                                                                                                                                                   "$ref":  "#/components/schemas/ProblemDetails"
+                                                                                                                                               }
+                                                                                                                                }
+                                                                                                              }
+                                                                                              },
+                                                                                      "503":  {
+                                                                                                  "description":  "Service Unavailable",
+                                                                                                  "content":  {
+                                                                                                                  "text/plain":  {
+                                                                                                                                     "schema":  {
+                                                                                                                                                    "$ref":  "#/components/schemas/ProblemDetails"
+                                                                                                                                                }
+                                                                                                                                 },
+                                                                                                                  "application/json":  {
+                                                                                                                                           "schema":  {
+                                                                                                                                                          "$ref":  "#/components/schemas/ProblemDetails"
+                                                                                                                                                      }
+                                                                                                                                       },
+                                                                                                                  "text/json":  {
+                                                                                                                                    "schema":  {
+                                                                                                                                                   "$ref":  "#/components/schemas/ProblemDetails"
+                                                                                                                                               }
+                                                                                                                                }
+                                                                                                              }
+                                                                                              }
+                                                                                  },
+                                                                    "security":  [
+                                                                                     {
+                                                                                         "IncidentKey":  [
+
+                                                                                                         ]
+                                                                                     }
+                                                                                 ]
+                                                                }
+                                                  },
+                  "/health":  {
+                                  "get":  {
+                                              "tags":  [
+                                                           "Status"
+                                                       ],
+                                              "responses":  {
+                                                                "200":  {
+                                                                            "description":  "OK",
+                                                                            "content":  {
+                                                                                            "text/plain":  {
+                                                                                                               "schema":  {
+                                                                                                                              "$ref":  "#/components/schemas/HealthResponse"
+                                                                                                                          }
+                                                                                                           },
+                                                                                            "application/json":  {
+                                                                                                                     "schema":  {
+                                                                                                                                    "$ref":  "#/components/schemas/HealthResponse"
+                                                                                                                                }
+                                                                                                                 },
+                                                                                            "text/json":  {
+                                                                                                              "schema":  {
+                                                                                                                             "$ref":  "#/components/schemas/HealthResponse"
+                                                                                                                         }
+                                                                                                          }
+                                                                                        }
+                                                                        },
+                                                                "503":  {
+                                                                            "description":  "Service Unavailable",
+                                                                            "content":  {
+                                                                                            "text/plain":  {
+                                                                                                               "schema":  {
+                                                                                                                              "$ref":  "#/components/schemas/ProblemDetails"
+                                                                                                                          }
+                                                                                                           },
+                                                                                            "application/json":  {
+                                                                                                                     "schema":  {
+                                                                                                                                    "$ref":  "#/components/schemas/ProblemDetails"
+                                                                                                                                }
+                                                                                                                 },
+                                                                                            "text/json":  {
+                                                                                                              "schema":  {
+                                                                                                                             "$ref":  "#/components/schemas/ProblemDetails"
+                                                                                                                         }
+                                                                                                          }
+                                                                                        }
+                                                                        }
+                                                            }
+                                          }
+                              },
+                  "/api/status":  {
+                                      "get":  {
+                                                  "tags":  [
+                                                               "Status"
+                                                           ],
+                                                  "responses":  {
+                                                                    "200":  {
+                                                                                "description":  "OK",
+                                                                                "content":  {
+                                                                                                "text/plain":  {
+                                                                                                                   "schema":  {
+                                                                                                                                  "$ref":  "#/components/schemas/StatusSummary"
+                                                                                                                              }
+                                                                                                               },
+                                                                                                "application/json":  {
+                                                                                                                         "schema":  {
+                                                                                                                                        "$ref":  "#/components/schemas/StatusSummary"
+                                                                                                                                    }
+                                                                                                                     },
+                                                                                                "text/json":  {
+                                                                                                                  "schema":  {
+                                                                                                                                 "$ref":  "#/components/schemas/StatusSummary"
+                                                                                                                             }
+                                                                                                              }
+                                                                                            }
+                                                                            }
+                                                                }
+                                              }
+                                  },
+                  "/api/services":  {
+                                        "get":  {
+                                                    "tags":  [
+                                                                 "Status"
+                                                             ],
+                                                    "responses":  {
+                                                                      "200":  {
+                                                                                  "description":  "OK",
+                                                                                  "content":  {
+                                                                                                  "text/plain":  {
+                                                                                                                     "schema":  {
+                                                                                                                                    "type":  "array",
+                                                                                                                                    "items":  {
+                                                                                                                                                  "$ref":  "#/components/schemas/ServiceDto"
+                                                                                                                                              }
+                                                                                                                                }
+                                                                                                                 },
+                                                                                                  "application/json":  {
+                                                                                                                           "schema":  {
+                                                                                                                                          "type":  "array",
+                                                                                                                                          "items":  {
+                                                                                                                                                        "$ref":  "#/components/schemas/ServiceDto"
+                                                                                                                                                    }
+                                                                                                                                      }
+                                                                                                                       },
+                                                                                                  "text/json":  {
+                                                                                                                    "schema":  {
+                                                                                                                                   "type":  "array",
+                                                                                                                                   "items":  {
+                                                                                                                                                 "$ref":  "#/components/schemas/ServiceDto"
+                                                                                                                                             }
+                                                                                                                               }
+                                                                                                                }
+                                                                                              }
+                                                                              }
+                                                                  }
+                                                }
+                                    }
+              },
+    "components":  {
+                       "schemas":  {
+                                       "CreateIncidentRequest":  {
+                                                                     "required":  [
+                                                                                      "serviceId",
+                                                                                      "title",
+                                                                                      "description",
+                                                                                      "severity"
+                                                                                  ],
+                                                                     "type":  "object",
+                                                                     "properties":  {
+                                                                                        "serviceId":  {
+                                                                                                          "pattern":  "^[a-z][a-z0-9-]{1,49}$",
+                                                                                                          "type":  "string"
+                                                                                                      },
+                                                                                        "title":  {
+                                                                                                      "maxLength":  120,
+                                                                                                      "minLength":  3,
+                                                                                                      "type":  "string"
+                                                                                                  },
+                                                                                        "description":  {
+                                                                                                            "maxLength":  1000,
+                                                                                                            "minLength":  10,
+                                                                                                            "type":  "string"
+                                                                                                        },
+                                                                                        "severity":  {
+                                                                                                         "$ref":  "#/components/schemas/IncidentSeverity"
+                                                                                                     }
+                                                                                    }
+                                                                 },
+                                       "HealthResponse":  {
+                                                              "required":  [
+                                                                               "status"
+                                                                           ],
+                                                              "type":  "object",
+                                                              "properties":  {
+                                                                                 "status":  {
+                                                                                                "type":  "string"
+                                                                                            }
+                                                                             }
+                                                          },
+                                       "HistoryBucket":  {
+                                                             "required":  [
+                                                                              "from",
+                                                                              "status",
+                                                                              "samples",
+                                                                              "availabilityPercent"
+                                                                          ],
+                                                             "type":  "object",
+                                                             "properties":  {
+                                                                                "from":  {
+                                                                                             "type":  "string",
+                                                                                             "format":  "date-time"
+                                                                                         },
+                                                                                "status":  {
+                                                                                               "oneOf":  [
+                                                                                                             {
+                                                                                                                 "enum":  [
+                                                                                                                              null
+                                                                                                                          ],
+                                                                                                                 "nullable":  true
+                                                                                                             },
+                                                                                                             {
+                                                                                                                 "$ref":  "#/components/schemas/ServiceStatus"
+                                                                                                             }
+                                                                                                         ]
+                                                                                           },
+                                                                                "samples":  {
+                                                                                                "pattern":  "^-?(?:0|[1-9]\\d*)$",
+                                                                                                "anyOf":  [
+                                                                                                              {
+                                                                                                                  "type":  "integer"
+                                                                                                              },
+                                                                                                              {
+                                                                                                                  "type":  "string"
+                                                                                                              }
+                                                                                                          ],
+                                                                                                "format":  "int32"
+                                                                                            },
+                                                                                "availabilityPercent":  {
+                                                                                                            "pattern":  "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+                                                                                                            "anyOf":  [
+                                                                                                                          {
+                                                                                                                              "type":  "number"
+                                                                                                                          },
+                                                                                                                          {
+                                                                                                                              "type":  "string"
+                                                                                                                          },
+                                                                                                                          {
+                                                                                                                              "enum":  [
+                                                                                                                                           null
+                                                                                                                                       ],
+                                                                                                                              "nullable":  true
+                                                                                                                          }
+                                                                                                                      ],
+                                                                                                            "format":  "double",
+                                                                                                            "nullable":  true
+                                                                                                        }
+                                                                            }
+                                                         },
+                                       "IncidentDto":  {
+                                                           "required":  [
+                                                                            "id",
+                                                                            "serviceId",
+                                                                            "serviceName",
+                                                                            "title",
+                                                                            "description",
+                                                                            "severity",
+                                                                            "status",
+                                                                            "createdAt",
+                                                                            "resolvedAt",
+                                                                            "resolution"
+                                                                        ],
+                                                           "type":  "object",
+                                                           "properties":  {
+                                                                              "id":  {
+                                                                                         "type":  "string",
+                                                                                         "format":  "uuid"
+                                                                                     },
+                                                                              "serviceId":  {
+                                                                                                "type":  "string"
+                                                                                            },
+                                                                              "serviceName":  {
+                                                                                                  "type":  "string"
+                                                                                              },
+                                                                              "title":  {
+                                                                                            "type":  "string"
+                                                                                        },
+                                                                              "description":  {
+                                                                                                  "type":  "string"
+                                                                                              },
+                                                                              "severity":  {
+                                                                                               "$ref":  "#/components/schemas/IncidentSeverity"
+                                                                                           },
+                                                                              "status":  {
+                                                                                             "$ref":  "#/components/schemas/IncidentStatus"
+                                                                                         },
+                                                                              "createdAt":  {
+                                                                                                "type":  "string",
+                                                                                                "format":  "date-time"
+                                                                                            },
+                                                                              "resolvedAt":  {
+                                                                                                 "type":  "string",
+                                                                                                 "format":  "date-time",
+                                                                                                 "nullable":  true
+                                                                                             },
+                                                                              "resolution":  {
+                                                                                                 "type":  "string",
+                                                                                                 "nullable":  true
+                                                                                             }
+                                                                          }
+                                                       },
+                                       "IncidentSeverity":  {
+                                                                "type":  "integer"
+                                                            },
+                                       "IncidentStatus":  {
+                                                              "type":  "integer"
+                                                          },
+                                       "ProblemDetails":  {
+                                                              "type":  "object",
+                                                              "properties":  {
+                                                                                 "type":  {
+                                                                                              "type":  "string",
+                                                                                              "nullable":  true
+                                                                                          },
+                                                                                 "title":  {
+                                                                                               "type":  "string",
+                                                                                               "nullable":  true
+                                                                                           },
+                                                                                 "status":  {
+                                                                                                "pattern":  "^-?(?:0|[1-9]\\d*)$",
+                                                                                                "anyOf":  [
+                                                                                                              {
+                                                                                                                  "type":  "integer"
+                                                                                                              },
+                                                                                                              {
+                                                                                                                  "type":  "string"
+                                                                                                              },
+                                                                                                              {
+                                                                                                                  "enum":  [
+                                                                                                                               null
+                                                                                                                           ],
+                                                                                                                  "nullable":  true
+                                                                                                              }
+                                                                                                          ],
+                                                                                                "format":  "int32",
+                                                                                                "nullable":  true
+                                                                                            },
+                                                                                 "detail":  {
+                                                                                                "type":  "string",
+                                                                                                "nullable":  true
+                                                                                            },
+                                                                                 "instance":  {
+                                                                                                  "type":  "string",
+                                                                                                  "nullable":  true
+                                                                                              }
+                                                                             }
+                                                          },
+                                       "ResolveIncidentRequest":  {
+                                                                      "required":  [
+                                                                                       "resolution"
+                                                                                   ],
+                                                                      "type":  "object",
+                                                                      "properties":  {
+                                                                                         "resolution":  {
+                                                                                                            "maxLength":  1000,
+                                                                                                            "minLength":  10,
+                                                                                                            "type":  "string"
+                                                                                                        }
+                                                                                     }
+                                                                  },
+                                       "ServiceDto":  {
+                                                          "required":  [
+                                                                           "id",
+                                                                           "name",
+                                                                           "description",
+                                                                           "status",
+                                                                           "lastCheckedAt",
+                                                                           "responseTimeMs",
+                                                                           "isStale",
+                                                                           "availabilityPercent",
+                                                                           "sampleCount",
+                                                                           "history"
+                                                                       ],
+                                                          "type":  "object",
+                                                          "properties":  {
+                                                                             "id":  {
+                                                                                        "type":  "string"
+                                                                                    },
+                                                                             "name":  {
+                                                                                          "type":  "string"
+                                                                                      },
+                                                                             "description":  {
+                                                                                                 "type":  "string"
+                                                                                             },
+                                                                             "status":  {
+                                                                                            "$ref":  "#/components/schemas/ServiceStatus"
+                                                                                        },
+                                                                             "lastCheckedAt":  {
+                                                                                                   "type":  "string",
+                                                                                                   "format":  "date-time",
+                                                                                                   "nullable":  true
+                                                                                               },
+                                                                             "responseTimeMs":  {
+                                                                                                    "pattern":  "^-?(?:0|[1-9]\\d*)$",
+                                                                                                    "anyOf":  [
+                                                                                                                  {
+                                                                                                                      "type":  "integer"
+                                                                                                                  },
+                                                                                                                  {
+                                                                                                                      "type":  "string"
+                                                                                                                  },
+                                                                                                                  {
+                                                                                                                      "enum":  [
+                                                                                                                                   null
+                                                                                                                               ],
+                                                                                                                      "nullable":  true
+                                                                                                                  }
+                                                                                                              ],
+                                                                                                    "format":  "int32",
+                                                                                                    "nullable":  true
+                                                                                                },
+                                                                             "isStale":  {
+                                                                                             "type":  "boolean"
+                                                                                         },
+                                                                             "availabilityPercent":  {
+                                                                                                         "pattern":  "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+                                                                                                         "anyOf":  [
+                                                                                                                       {
+                                                                                                                           "type":  "number"
+                                                                                                                       },
+                                                                                                                       {
+                                                                                                                           "type":  "string"
+                                                                                                                       },
+                                                                                                                       {
+                                                                                                                           "enum":  [
+                                                                                                                                        null
+                                                                                                                                    ],
+                                                                                                                           "nullable":  true
+                                                                                                                       }
+                                                                                                                   ],
+                                                                                                         "format":  "double",
+                                                                                                         "nullable":  true
+                                                                                                     },
+                                                                             "sampleCount":  {
+                                                                                                 "pattern":  "^-?(?:0|[1-9]\\d*)$",
+                                                                                                 "anyOf":  [
+                                                                                                               {
+                                                                                                                   "type":  "integer"
+                                                                                                               },
+                                                                                                               {
+                                                                                                                   "type":  "string"
+                                                                                                               }
+                                                                                                           ],
+                                                                                                 "format":  "int32"
+                                                                                             },
+                                                                             "history":  {
+                                                                                             "type":  "array",
+                                                                                             "items":  {
+                                                                                                           "$ref":  "#/components/schemas/HistoryBucket"
+                                                                                                       }
+                                                                                         }
+                                                                         }
+                                                      },
+                                       "ServiceStatus":  {
+                                                             "type":  "integer"
+                                                         },
+                                       "StatusSummary":  {
+                                                             "required":  [
+                                                                              "generatedAt",
+                                                                              "isDemo",
+                                                                              "overallStatus",
+                                                                              "pollIntervalSeconds",
+                                                                              "openIncidentCount",
+                                                                              "services",
+                                                                              "recentIncidents"
+                                                                          ],
+                                                             "type":  "object",
+                                                             "properties":  {
+                                                                                "generatedAt":  {
+                                                                                                    "type":  "string",
+                                                                                                    "format":  "date-time"
+                                                                                                },
+                                                                                "isDemo":  {
+                                                                                               "type":  "boolean"
+                                                                                           },
+                                                                                "overallStatus":  {
+                                                                                                      "$ref":  "#/components/schemas/ServiceStatus"
+                                                                                                  },
+                                                                                "pollIntervalSeconds":  {
+                                                                                                            "pattern":  "^-?(?:0|[1-9]\\d*)$",
+                                                                                                            "anyOf":  [
+                                                                                                                          {
+                                                                                                                              "type":  "integer"
+                                                                                                                          },
+                                                                                                                          {
+                                                                                                                              "type":  "string"
+                                                                                                                          }
+                                                                                                                      ],
+                                                                                                            "format":  "int32"
+                                                                                                        },
+                                                                                "openIncidentCount":  {
+                                                                                                          "pattern":  "^-?(?:0|[1-9]\\d*)$",
+                                                                                                          "anyOf":  [
+                                                                                                                        {
+                                                                                                                            "type":  "integer"
+                                                                                                                        },
+                                                                                                                        {
+                                                                                                                            "type":  "string"
+                                                                                                                        }
+                                                                                                                    ],
+                                                                                                          "format":  "int32"
+                                                                                                      },
+                                                                                "services":  {
+                                                                                                 "type":  "array",
+                                                                                                 "items":  {
+                                                                                                               "$ref":  "#/components/schemas/ServiceDto"
+                                                                                                           }
+                                                                                             },
+                                                                                "recentIncidents":  {
+                                                                                                        "type":  "array",
+                                                                                                        "items":  {
+                                                                                                                      "$ref":  "#/components/schemas/IncidentDto"
+                                                                                                                  }
+                                                                                                    }
+                                                                            }
+                                                         },
+                                       "ValidationProblemDetails":  {
+                                                                        "type":  "object",
+                                                                        "properties":  {
+                                                                                           "type":  {
+                                                                                                        "type":  "string",
+                                                                                                        "nullable":  true
+                                                                                                    },
+                                                                                           "title":  {
+                                                                                                         "type":  "string",
+                                                                                                         "nullable":  true
+                                                                                                     },
+                                                                                           "status":  {
+                                                                                                          "pattern":  "^-?(?:0|[1-9]\\d*)$",
+                                                                                                          "anyOf":  [
+                                                                                                                        {
+                                                                                                                            "type":  "integer"
+                                                                                                                        },
+                                                                                                                        {
+                                                                                                                            "type":  "string"
+                                                                                                                        },
+                                                                                                                        {
+                                                                                                                            "enum":  [
+                                                                                                                                         null
+                                                                                                                                     ],
+                                                                                                                            "nullable":  true
+                                                                                                                        }
+                                                                                                                    ],
+                                                                                                          "format":  "int32",
+                                                                                                          "nullable":  true
+                                                                                                      },
+                                                                                           "detail":  {
+                                                                                                          "type":  "string",
+                                                                                                          "nullable":  true
+                                                                                                      },
+                                                                                           "instance":  {
+                                                                                                            "type":  "string",
+                                                                                                            "nullable":  true
+                                                                                                        },
+                                                                                           "errors":  {
+                                                                                                          "type":  "object",
+                                                                                                          "additionalProperties":  {
+                                                                                                                                       "type":  "array",
+                                                                                                                                       "items":  {
+                                                                                                                                                     "type":  "string"
+                                                                                                                                                 }
+                                                                                                                                   }
+                                                                                                      }
+                                                                                       }
+                                                                    }
+                                   },
+                       "securitySchemes":  {
+                                               "IncidentKey":  {
+                                                                   "type":  "apiKey",
+                                                                   "name":  "X-OpsPulse-Key",
+                                                                   "in":  "header"
+                                                               }
+                                           }
+                   },
+    "tags":  [
+                 {
+                     "name":  "Incidents"
+                 },
+                 {
+                     "name":  "Status"
+                 }
+             ]
+}

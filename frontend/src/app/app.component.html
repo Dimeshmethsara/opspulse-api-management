@@ -1,0 +1,62 @@
+<a class="skip-link" href="#main">Skip to dashboard</a>
+<aside class="sidebar" aria-label="Main navigation">
+  <a class="brand" href="#overview" aria-label="OpsPulse home"><svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="11" fill="currentColor"/><path d="M7 22h7l4-11 6 19 4-8h5" fill="none" stroke="#c5f6a3" stroke-width="2.4" stroke-linejoin="round"/></svg>OpsPulse</a>
+  <div class="workspace-label">WORKSPACE</div>
+  <div class="workspace"><span class="workspace-avatar">OP</span><div><strong>Operations</strong><span>Service monitoring</span></div></div>
+  <div class="nav-label">MONITOR</div>
+  <nav>
+    <a class="nav-link" href="#overview"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Overview</a>
+    <a class="nav-link" href="#services"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="7" rx="2"/><rect x="3" y="14" width="18" height="7" rx="2"/><path d="M7 6.5h1M7 17.5h1"/></svg>Services <span class="nav-count">{{ data()?.services?.length ?? '—' }}</span></a>
+    <a class="nav-link" href="#incidents"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 10 17H2L12 3Z"/><path d="M12 9v4m0 3v1"/></svg>Incidents @if (data(); as summary) { <span class="nav-count alert-count">{{ summary.openIncidentCount }}</span> }</a>
+    <a class="nav-link" href="#availability"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4v16h17M8 15V9m5 6V5m5 10v-4"/></svg>Availability</a>
+  </nav>
+  <div class="sidebar-foot"><div class="read-only-icon" aria-hidden="true">◉</div><strong>A clear view. Every service.</strong><p>Public health information.<br>Read-only dashboard.</p><span class="version-label">OPSPULSE / v1.0</span></div>
+</aside>
+
+<div class="page-shell">
+  <header class="topbar"><span class="breadcrumb">Workspace <span>/</span> <strong>Overview</strong></span><div class="topbar-right"><span class="connection-label">{{ error() ? 'Connection interrupted' : loading() ? 'Updating status' : 'Refreshes every 30s' }}</span><span class="operator-avatar" title="Public dashboard">OP</span></div></header>
+  <main id="main">
+    <section id="overview" class="overview-section" aria-labelledby="page-title">
+      <div class="page-heading"><div><div class="eyebrow">YOUR OPERATIONS, AT A GLANCE</div><h1 id="page-title">System overview</h1><p>One place to keep a pulse on every service.</p></div><button class="refresh-button" type="button" (click)="refresh()" [disabled]="loading()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6 7a7 7 0 0 1 12-1l2 3M4 15l2 3a7 7 0 0 0 12-1"/></svg>{{ loading() ? 'Refreshing…' : 'Refresh status' }}</button></div>
+      @if (error()) {
+        <div class="error-banner" role="alert"><strong>Unable to reach the status API.</strong> {{ data() ? 'Showing the last successful update. Status may have changed.' : 'Check that the backend is running and the configured API URL is correct.' }} <button type="button" (click)="refresh()" [disabled]="loading()">Try again</button></div>
+      }
+      @if (data(); as summary) {
+        <div class="health-banner" [class.all-healthy]="summary.overallStatus === 'Healthy' && !error()" [class.connection-error]="error()">
+          <div class="health-symbol" aria-hidden="true">{{ error() ? '!' : summary.overallStatus === 'Healthy' ? '✓' : '!' }}</div><div class="health-message"><h2>{{ headline() }}</h2><p>{{ affectedCount() }} of {{ summary.services.length }} services affected <span>·</span> {{ summary.openIncidentCount }} open incidents</p></div><div class="banner-meta">@if (summary.isDemo) { <span class="demo-label">DEMO DATA</span> }<span>Updated {{ summary.generatedAt | date:'HH:mm:ss' }}</span></div>
+        </div>
+        <div class="metrics-grid">
+          <article class="metric"><span class="metric-label">Services monitored <span class="metric-glyph" aria-hidden="true">▤</span></span><strong>{{ summary.services.length }}<small>services</small></strong><span class="metric-caption">Across your configured registry</span></article>
+          <article class="metric"><span class="metric-label">Healthy services <span class="metric-glyph healthy-text" aria-hidden="true">✓</span></span><strong>{{ healthyCount() }}<small>/ {{ summary.services.length }}</small></strong><span class="metric-caption">{{ affectedCount() }} currently need attention</span></article>
+          <article class="metric"><span class="metric-label">Fleet availability <span class="metric-glyph" aria-hidden="true">⌁</span></span><strong>{{ fleetAvailability() === null ? '—' : (fleetAvailability() | number:'1.2-2') }}<small>%</small></strong><span class="metric-caption">Mean healthy sample rate · 24h</span></article>
+          <article class="metric"><span class="metric-label">Open incidents <span class="metric-glyph warning-text" aria-hidden="true">△</span></span><strong>{{ summary.openIncidentCount }}<small>open</small></strong><span class="metric-caption">Follow the latest updates below</span></article>
+        </div>
+      } @else if (loading()) {
+        <div class="loading-panel" role="status"><div class="loading-pulse"></div>Connecting to your services…</div>
+      }
+    </section>
+
+    <section id="services" aria-labelledby="services-title">
+      <div class="section-heading"><div><h2 id="services-title">Service health <span class="section-count">{{ data()?.services?.length ?? 0 }}</span></h2><p>Current status and a little perspective on the last 24 hours.</p></div><div class="service-controls"><label class="search-field"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg><input type="search" aria-label="Search services" placeholder="Find a service…" [value]="search()" (input)="setSearch($event)"></label><label class="status-select"><span class="visually-hidden">Filter services by status</span><select (change)="setServiceFilter($event)" [value]="serviceFilter()">@for (status of statusFilters; track status) { <option [value]="status">{{ status === 'All' ? 'All statuses' : status }}</option> }</select></label></div></div>
+      <div class="service-grid" [attr.aria-busy]="loading()">
+        @for (service of filteredServices(); track service.id) { <app-service-card [service]="service" /> }
+      </div>
+      @if (data() && filteredServices().length === 0) { <p class="empty-state">No services match your search and status filter.</p> }
+    </section>
+
+    <section id="incidents" aria-labelledby="incidents-title">
+      <div class="section-heading"><div><h2 id="incidents-title">Recent incidents</h2><p>Updates from your services, from investigation to recovery. Latest 20 shown.</p></div><div class="segmented-control" aria-label="Filter incidents">@for (filter of incidentFilters; track filter) { <button type="button" (click)="incidentFilter.set(filter)" [class.selected]="incidentFilter() === filter" [attr.aria-pressed]="incidentFilter() === filter">{{ filter }}</button> }</div></div>
+      <div class="incident-panel">
+        @for (incident of filteredIncidents(); track incident.id) {
+          <article class="incident-item"><div class="incident-marker" [class.resolved]="incident.status === 'Resolved'" aria-hidden="true">{{ incident.status === 'Resolved' ? '✓' : '!' }}</div><div class="incident-content"><div class="incident-title-row"><h3>{{ incident.title }}</h3><span [class]="'incident-state ' + incident.status.toLowerCase()">{{ incident.status }}</span><span class="severity">{{ incident.severity }}</span></div><p>{{ incident.description }}</p>@if (incident.resolution) { <p class="resolution"><strong>Resolved:</strong> {{ incident.resolution }}</p> }<div class="incident-meta"><span>{{ incident.serviceName }}</span><span>Opened {{ incident.createdAt | date:'MMM d, HH:mm' }}</span>@if (incident.resolvedAt) { <span>Resolved {{ incident.resolvedAt | date:'MMM d, HH:mm' }}</span> }</div></div></article>
+        } @empty { <div class="empty-state">{{ data() ? 'No recent incidents in this view.' : 'Incident updates will appear when the API connects.' }}</div> }
+      </div>
+    </section>
+
+    <section id="availability" aria-labelledby="availability-title">
+      <div class="section-heading"><div><h2 id="availability-title">Availability history</h2><p>Each block is one hour. The most severe sampled status sets its color.</p></div><div class="legend"><span><i class="healthy"></i>Healthy</span><span><i class="degraded"></i>Degraded</span><span><i class="down"></i>Down</span><span><i class="unknown"></i>No checks</span></div></div>
+      <div class="availability-panel"><div class="history-scroll"><table class="history-table"><caption class="visually-hidden">Hourly service status over the last 24 hours. Timestamps use your local timezone.</caption><thead><tr><th scope="col">SERVICE</th><th scope="col">HOURLY STATUS · LAST 24H</th><th scope="col">HEALTHY SAMPLES</th></tr></thead><tbody>@for (service of data()?.services ?? []; track service.id) { <tr><th scope="row">{{ service.name }}</th><td><div class="history-bars detailed">@for (bucket of service.history; track bucket.from) { <span tabindex="0" [class]="'history-bar ' + (bucket.status?.toLowerCase() ?? 'unknown')" [title]="historyLabel(bucket.from, bucket.status, bucket.samples)" [attr.aria-label]="historyLabel(bucket.from, bucket.status, bucket.samples)"><span class="bucket-tooltip">{{ bucket.from | date:'MMM d, HH:mm' }} · {{ bucket.status ?? 'No checks' }} · {{ bucket.samples }} checks</span></span> }</div></td><td>{{ service.availabilityPercent === null ? '—' : (service.availabilityPercent | number:'1.2-2') + '%' }} <small>{{ service.sampleCount }} checks</small></td></tr> }</tbody></table></div><div class="history-note"><span>Availability = healthy checks ÷ all checks. Degraded checks reduce availability.</span><span>Times are shown in your local timezone.</span></div></div>
+    </section>
+    <footer class="page-footer"><span>OpsPulse <span class="footer-separator">/</span> Know your services. Own your uptime.</span><span>Service health, without the noise.</span></footer>
+  </main>
+</div>
