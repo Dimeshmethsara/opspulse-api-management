@@ -59,6 +59,36 @@ No OAuth token or backend operator key was read or used in those gateway checks.
 
 ## Git publication checks
 
-After completing the review, the publication sequence is: inspect the target again, stage only reviewed files, run `git diff --cached --check` and `node scripts/review-publication.mjs --staged`, create a descriptive commit, create the public repository without an auto-generated README/history, attach the verified origin, and run `git push --set-upstream origin main` without force.
+The first push succeeded to the public repository at `https://github.com/Dimeshmethsara/opspulse-api-management`, default branch `main`. Initial commit: `e3153d7509d371d38f7880d9465574bbccfc470e`. GitHub's commit API confirmed author name **Dimesh Methsara Opanayaka** and associated GitHub account `Dimeshmethsara`. Local HEAD and the remote `refs/heads/main` matched. The anonymous repository page returned HTTP 200.
 
-The final remote/branch/commit should be checked with `git remote -v`, `git rev-parse HEAD`, `git ls-remote --heads origin main`, and the GitHub repository/commit APIs. GitHub's rendered README response and screenshot content paths should be checked after publication. Hosted workflow results must be read from actual Actions runs; the presence of workflow YAML alone is not a passing CI claim.
+| Command | Observed result |
+| --- | --- |
+| `git add -- .dockerignore .env.example .gitattributes .github .gitignore OpsPulse.slnx README.md backend docs dotnet-tools.json frontend global.json incident.json scripts` | Staged 70 reviewed files, excluding runtime/private artifacts |
+| `git diff --cached --check` | Passed |
+| `node scripts/review-publication.mjs --staged` | All 70 staged files passed configured pattern/artifact checks |
+| `git commit -m 'Build OpsPulse service monitoring and API management demo'` | Created the initial commit above |
+| `gh repo create Dimeshmethsara/opspulse-api-management --public --source . --remote origin --description 'Local .NET 10 and Angular service monitoring demo with SQLite incidents, safe probes, and Choreo API Manager integration.'` | Created the intended empty public repository and origin |
+| `git push --set-upstream origin main` | Created remote `main` and configured tracking; no force option used |
+| `git rev-parse HEAD`; `git ls-remote --heads origin main`; `git status --short --branch` | Matching commit; clean tracked working tree after the initial push |
+| `gh repo view Dimeshmethsara/opspulse-api-management --json nameWithOwner,url,isPrivate,defaultBranchRef` | Correct owner/name, public visibility and default branch `main` |
+| `gh api repos/Dimeshmethsara/opspulse-api-management/commits/main --jq '{sha: .sha, github_author: .author.login, author_name: .commit.author.name, author_email: .commit.author.email, message: .commit.message}'` | Confirmed commit, requested author and GitHub account association |
+| `gh api repos/Dimeshmethsara/opspulse-api-management/readme -H 'Accept: application/vnd.github.html+json'` | GitHub-rendered heading, tables, security section and screenshot reference verified |
+| `gh api repos/Dimeshmethsara/opspulse-api-management/contents/docs/screenshots/dashboard-desktop.png --jq '{path: .path, size: .size, type: .type}'` | Real desktop image present, 214261 bytes |
+| `gh api repos/Dimeshmethsara/opspulse-api-management/contents/docs/screenshots/dashboard-mobile.png --jq '{path: .path, size: .size, type: .type}'` | Real mobile image present, 191355 bytes |
+
+Git's line-ending warnings during initial staging reflected the explicit `.gitattributes` policy (LF text, CRLF PowerShell); the staged whitespace check passed. No file content was replaced to suppress a test failure.
+
+## First hosted CI failure and lockfile repair
+
+[Initial Actions run 44532949164](https://github.com/Dimeshmethsara/opspulse-api-management/actions/runs/44532949164) ran against the initial commit. The backend build/tests and Docker image build passed. The frontend job failed at `npm ci`, reporting missing `@emnapi/core@1.11.3` and `@emnapi/runtime@1.11.3` lock entries. Its later frontend steps were skipped, not passing. Logs were inspected with `gh run view 44532949164 --repo Dimeshmethsara/opspulse-api-management --log-failed`.
+
+Local npm metadata requests briefly encountered DNS failures and then succeeded. Regenerating with the Windows npm environment did not add the missing entries. A separate Linux container using an already available supported Node 22 image regenerated the copied manifests under ignored `artifacts/linux-lockfile-review`, without installing system-wide software or deleting source files:
+
+```powershell
+docker run --detach --name opspulse-lockfile-review `
+  --mount 'type=bind,source=F:\OpsPulse\artifacts\linux-lockfile-review,target=/work' `
+  -w /work node:22-alpine sh -c `
+  'npm install --package-lock-only --ignore-scripts --include=optional && npm ci --dry-run --ignore-scripts'
+```
+
+The Linux command exited successfully with zero audit findings. Comparison showed exactly two added optional packages and no removed package or changed existing dependency version. The reviewed lockfile was copied back to `frontend/package-lock.json`; metadata-only peer flags were normalized by npm. No application source behavior or test expectation changed. The correction and this command record are committed normally and pushed to `main`; no history rewrite, test bypass, or force push is used. Subsequent hosted run results must be checked in Actions rather than inferred from local checks or this document.

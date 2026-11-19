@@ -28,7 +28,7 @@ Local verification date: **2026-11-19**, Asia/Colombo. This file records observe
 | Docker image build | **Passed**, final multi-stage image `opspulse-api:local`, including Linux restore/publish |
 | Docker runtime and restart | **Passed**, readiness and full API smoke on loopback; uid/gid 1654 (`app`); SQLite state and three incident seeds preserved across restart; verification container stopped |
 | Browser integration checks | **2 passed** using installed Microsoft Edge via Playwright: real API data, filters, 390px mobile layout and connection-failure behavior; screenshots reviewed |
-| GitHub Actions workflow | YAML parsed successfully with all three jobs; not executed on GitHub from this workspace |
+| GitHub Actions workflow | Triggered on first publication; backend and Docker passed, frontend clean install failed on missing optional lockfile entries; see publication record and Actions for subsequent results |
 | Local Choreo API Manager routing | Anonymous status JSON and services reads returned 200; anonymous incident listing returned 401 at `https://localhost:8243/opspulse/1.0.0` |
 
 ## Publication recheck on 2026-11-19
@@ -72,6 +72,7 @@ Commands and publication boundaries are recorded in [publication-review.md](publ
 - The first container readiness window expired during cold startup. Subsequent IPv4 and localhost readiness checks and full smoke checks passed, including after restart.
 - An optional local CI YAML check initially could not find a YAML parser in the Angular dependencies. Parsed the workflow successfully with a temporary npm CLI tool, without adding an application dependency or global installation.
 - Windows treats `data/` and the source `Data/` as the same directory. Changed the local runtime database location to ignored `storage/` and avoided ignoring the source directory. No database files were deleted.
+- The first hosted CI run exposed missing optional `@emnapi/core` and `@emnapi/runtime` entries in the Windows-generated npm lockfile. Regenerated lock metadata in an isolated Linux container; exactly those two packages were added, with no existing dependency version changed. Linux lockfile regeneration/audit and install dry-run passed. Hosted CI is rerun on the corrected commit; its actual result is available in Actions.
 
 ## Retained local artifacts
 

@@ -1,5 +1,7 @@
 # OpsPulse
 
+[![OpsPulse CI](https://github.com/Dimeshmethsara/opspulse-api-management/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Dimeshmethsara/opspulse-api-management/actions/workflows/ci.yml)
+
 **Service health monitoring and incident management with a local Choreo API Manager integration.**
 
 OpsPulse combines an ASP.NET Core .NET 10 REST API, an Angular standalone dashboard, and EF Core SQLite persistence. It demonstrates how an operations application can expose public status information while keeping incident operations behind separate access controls.
